@@ -7,5 +7,8 @@ class ComprimentoModel extends MedidaModel {
   String get unidade => '';
 
   @override
+  set unidade(String valor) => unidade = valor;
+
+  @override
   List<String> get unidades => ['m', 'cm', 'mm'];
 }

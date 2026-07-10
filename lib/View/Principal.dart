@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/View/Configuracoes.dart';
+import 'package:flutter_application_2/ViewModel/Conversor.dart';
 import '../Model/MedidaModel.dart';
+import '../Model/TemperaturaModel.dart';
+import '../Model/ComprimentoModel.dart';
+import '../Model/MassaModel.dart';
+import '../Model/CapacidadeModel.dart';
 
 class Principal extends StatefulWidget {
   @override
@@ -8,24 +13,28 @@ class Principal extends StatefulWidget {
 }
 
 class _PrincipalState extends State<Principal> {
+  MedidaModel? medidaSelecionada;
+  String? unidadeOrigem;
+  String? unidadeDestino;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Conversor de Unidades'),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor, 
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         actions: [
-        IconButton(
-          icon: const Icon(Icons.settings),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Configuracoes()),
-            );
-          },
-        ),
-        ]
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Configuracoes()),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -49,11 +58,13 @@ class _PrincipalState extends State<Principal> {
                 child: Container(
                   color: const Color(0xFFE6B8E6),
                   child: Center(
-                    child: construirCaixinhaConversao<MedidaModel>(
-                      items: [],
-                      selecionado: null,
-                      onChanged: (MedidaModel? novoValor) {
-                        setState(() {});
+                    child: construirCaixinhaConversao(
+                      items: medidaSelecionada?.unidades ?? [],
+                      selecionado: unidadeOrigem,
+                      onChanged: (String? novoValor) {
+                        setState(() {
+                          unidadeOrigem = novoValor;
+                        });
                       },
                     ),
                   ),
@@ -75,12 +86,12 @@ class _PrincipalState extends State<Principal> {
                 child: Container(
                   color: const Color(0xFFE6B8E6),
                   child: Center(
-                    child: construirCaixinhaConversao<MedidaModel>(
-                      items: [],
-                      selecionado: null,
-                      onChanged: (MedidaModel? novoValor) {
+                    child: construirCaixinhaConversao(
+                      items: medidaSelecionada?.unidades ?? [],
+                      selecionado: unidadeDestino,
+                      onChanged: (String? novoValor) {
                         setState(() {
-                          // Atualize o estado com o novo valor selecionado
+                          unidadeDestino = novoValor;
                         });
                       },
                     ),
@@ -96,28 +107,28 @@ class _PrincipalState extends State<Principal> {
         color: Colors.purple.shade900,
         child: Row(
           children: [
-            Center(child: 
-            Container(
-              margin: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 8.0,
-              ),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF744383),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+            Center(
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF744383),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  onPressed: () {
+                    print('Botão de conversão pressionado');
+                  },
+                  child: const Text(
+                    'Converter',
+                    style: TextStyle(fontSize: 24, color: Color(0xFFE6B8E6)),
                   ),
                 ),
-                onPressed: () {
-                  print('Botão de conversão pressionado');
-                },
-                child: const Text(
-                  'Converter',
-                  style: TextStyle(fontSize: 24, color: Color(0xFFE6B8E6)),
-                ),
               ),
-            ),
             ),
           ],
         ),
@@ -138,7 +149,24 @@ class _PrincipalState extends State<Principal> {
           ),
         ),
         onPressed: () {
-          print('Botão $texto pressionado');
+          setState(() {
+            switch (texto) {
+              case 'Temperatura':
+                medidaSelecionada = TemperaturaModel();
+                break;
+              case 'Comprimento':
+                medidaSelecionada = ComprimentoModel();
+                break;
+              case 'Peso':
+                medidaSelecionada = MassaModel();
+                break;
+              case 'Capacidade':
+                medidaSelecionada = CapacidadeModel();
+                break;
+            }
+            unidadeOrigem = null;
+            unidadeDestino = null;
+          });
         },
         child: Text(
           texto,
@@ -149,9 +177,9 @@ class _PrincipalState extends State<Principal> {
   }
 
   Widget construirCaixinhaConversao<T extends MedidaModel>({
-    required List<T> items,
-    required T? selecionado,
-    required ValueChanged<T?> onChanged,
+    required List<String> items,
+    required String? selecionado,
+    required ValueChanged<String?> onChanged,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,13 +187,13 @@ class _PrincipalState extends State<Principal> {
         Expanded(
           child: SizedBox(
             height: 56,
-            child: DropdownButton<T>(
-              isExpanded: true,
+            child: DropdownButton<String>(
               value: selecionado,
-              underline: Container(height: 1, color: Colors.amber),
+              isExpanded: true,
               items: items
                   .map(
-                    (e) => DropdownMenuItem<T>(value: e, child: Text(e.nome)),
+                    (unidade) =>
+                        DropdownMenuItem(value: unidade, child: Text(unidade)),
                   )
                   .toList(),
               onChanged: onChanged,
