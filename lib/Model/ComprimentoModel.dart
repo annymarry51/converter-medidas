@@ -1,9 +1,5 @@
 import 'MedidaModel.dart';
 class ComprimentoModel extends MedidaModel {
-  double comprimento;
-
-  ComprimentoModel(this.comprimento) : super();
-
   @override
   String get nome => 'Comprimento';
 
