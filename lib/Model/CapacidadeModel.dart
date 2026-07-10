@@ -5,5 +5,9 @@ class CapacidadeModel extends MedidaModel {
   String get nome => 'Capacidade';
 
   @override
+  String get unidade => '';
+  @override
+  set unidade(String valor) => unidade = valor;
+  @override
   List<String> get unidades => ['L', 'mL', 'm³'];
 }
