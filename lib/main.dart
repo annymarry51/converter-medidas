@@ -1,20 +1,50 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview_plus/device_preview_plus.dart';
+import 'package:flutter_application_2/ViewModel/Preferencias.dart';
 import 'package:provider/provider.dart';
 import 'ViewModel/Conversor.dart';
 import 'View/principal.dart';
 
 void main() {
-  runApp(DevicePreview(enabled: !kReleaseMode, builder: (context) => MyApp()));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => Conversor()),
+        ChangeNotifierProvider(create: (_) => Preferencias()),
+      ],
+      child: DevicePreview(
+        enabled: !kReleaseMode,
+        builder: (context) => MyApp(),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => Conversor(),
-      child: MaterialApp(theme: ThemeData.dark(), home: Principal()),
+    final preferencias = Provider.of<Preferencias>(context);
+    return Consumer<Preferencias>(
+      builder: (context, prefs, child) {
+        return MaterialApp(
+          theme: obterTema(
+            prefs.temaSelecionado,
+          ), 
+          home: Principal(),
+        );
+      },
     );
+  }
+
+  ThemeData obterTema(String temaSelecionado) {
+    switch (temaSelecionado) {
+      case 'Azul':
+        return ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 160, 208, 248));
+      case 'Verde':
+        return ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 148, 245, 151));
+      default:
+        return ThemeData(scaffoldBackgroundColor: Color(0xFFE6B8E6));
+    }
   }
 }

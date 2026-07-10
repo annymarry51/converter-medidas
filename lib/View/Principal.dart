@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_2/View/Configuracoes.dart';
 import '../Model/MedidaModel.dart';
 
 class Principal extends StatefulWidget {
@@ -10,7 +11,22 @@ class _PrincipalState extends State<Principal> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE6B8E6),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('Conversor de Unidades'),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor, 
+        actions: [
+        IconButton(
+          icon: const Icon(Icons.settings),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Configuracoes()),
+            );
+          },
+        ),
+        ]
+      ),
       body: Column(
         children: [
           SizedBox(height: 50),
@@ -80,6 +96,7 @@ class _PrincipalState extends State<Principal> {
         color: Colors.purple.shade900,
         child: Row(
           children: [
+            Center(child: 
             Container(
               margin: const EdgeInsets.symmetric(
                 horizontal: 16.0,
@@ -101,12 +118,6 @@ class _PrincipalState extends State<Principal> {
                 ),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.settings),
-              color: Color(0xFFE6B8E6),
-              onPressed: () {
-                // Navegar para a tela de configurações
-              },
             ),
           ],
         ),
