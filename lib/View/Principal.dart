@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/View/Configuracoes.dart';
-import 'package:flutter_application_2/ViewModel/Conversor.dart';
 import '../Model/MedidaModel.dart';
 import '../Model/TemperaturaModel.dart';
 import '../Model/ComprimentoModel.dart';
 import '../Model/MassaModel.dart';
 import '../Model/CapacidadeModel.dart';
+import '../ViewModel/Conversor.dart';
 
 class Principal extends StatefulWidget {
   @override
@@ -13,9 +13,14 @@ class Principal extends StatefulWidget {
 }
 
 class _PrincipalState extends State<Principal> {
+  final TextEditingController origemController = TextEditingController();
+  final TextEditingController destinoController = TextEditingController();
+
+  final Conversor conversor = Conversor();
   MedidaModel? medidaSelecionada;
   String? unidadeOrigem;
   String? unidadeDestino;
+  double? valorOrigem;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +66,8 @@ class _PrincipalState extends State<Principal> {
                     child: construirCaixinhaConversao(
                       items: medidaSelecionada?.unidades ?? [],
                       selecionado: unidadeOrigem,
-                      onChanged: (String? novoValor) {
+                      controller: origemController,
+                      onChanged: (novoValor) {
                         setState(() {
                           unidadeOrigem = novoValor;
                         });
@@ -89,7 +95,9 @@ class _PrincipalState extends State<Principal> {
                     child: construirCaixinhaConversao(
                       items: medidaSelecionada?.unidades ?? [],
                       selecionado: unidadeDestino,
-                      onChanged: (String? novoValor) {
+                      controller: destinoController,
+                      somenteLeitura: true,
+                      onChanged: (novoValor) {
                         setState(() {
                           unidadeDestino = novoValor;
                         });
@@ -121,7 +129,25 @@ class _PrincipalState extends State<Principal> {
                     ),
                   ),
                   onPressed: () {
-                    print('Botão de conversão pressionado');
+                    if (medidaSelecionada == null ||
+                        unidadeOrigem == null ||
+                        unidadeDestino == null ||
+                        origemController.text.isEmpty) {
+                      return;
+                    }
+
+                    double valor = double.tryParse(origemController.text) ?? 0;
+
+                    double resultado = conversor.converter(
+                      medidaSelecionada!,
+                      valor,
+                      unidadeOrigem!,
+                      unidadeDestino!,
+                    );
+
+                    setState(() {
+                      destinoController.text = resultado.toStringAsFixed(6);
+                    });
                   },
                   child: const Text(
                     'Converter',
@@ -176,28 +202,39 @@ class _PrincipalState extends State<Principal> {
     );
   }
 
-  Widget construirCaixinhaConversao<T extends MedidaModel>({
+  Widget construirCaixinhaConversao({
     required List<String> items,
     required String? selecionado,
     required ValueChanged<String?> onChanged,
+    required TextEditingController controller,
+    bool somenteLeitura = false,
   }) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: SizedBox(
-            height: 56,
-            child: DropdownButton<String>(
-              value: selecionado,
-              isExpanded: true,
-              items: items
-                  .map(
-                    (unidade) =>
-                        DropdownMenuItem(value: unidade, child: Text(unidade)),
-                  )
-                  .toList(),
-              onChanged: onChanged,
+        SizedBox(
+          width: 100,
+          child: TextField(
+            controller: controller,
+            readOnly: somenteLeitura,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: 'Valor',
             ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: DropdownButton<String>(
+            value: selecionado,
+            isExpanded: true,
+            items: items
+                .map(
+                  (unidade) =>
+                      DropdownMenuItem(value: unidade, child: Text(unidade)),
+                )
+                .toList(),
+            onChanged: onChanged,
           ),
         ),
       ],

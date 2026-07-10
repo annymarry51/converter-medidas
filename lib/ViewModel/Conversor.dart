@@ -6,32 +6,22 @@ import '../Model/MassaModel.dart';
 import '../Model/CapacidadeModel.dart';
 
 class Conversor extends ChangeNotifier {
-  final TextEditingController fromText = TextEditingController();
-  final TextEditingController toText = TextEditingController();
   MedidaModel? para;
   MedidaModel? de;
 
-  void converter(MedidaModel medida) {
-    double valor = double.tryParse(fromText.text) ?? 0.0;
-    double resultado = 0.0;
-    String deUnidade = medida.unidade;
-    String paraUnidade = medida.unidade;
-
-    if (medida is TemperaturaModel) {
-      resultado = converterTemperatura(valor, deUnidade, paraUnidade);
-    } 
-    else if(medida is ComprimentoModel) {
-      resultado = converterComprimento(valor, deUnidade, paraUnidade);
-    } 
-    else if(medida is MassaModel) {
-      resultado = converterMassa(valor, deUnidade, paraUnidade);
-    } 
-    else if(medida is CapacidadeModel) {
-      resultado = converterCapacidade(valor, deUnidade, paraUnidade);
-    }
-    toText.text = resultado.toStringAsFixed(2);
+double converter( MedidaModel medida, double valor, String deUnidade, String paraUnidade) {
+  if (medida is TemperaturaModel) {
+    return converterTemperatura(valor, deUnidade, paraUnidade);
+  } else if (medida is ComprimentoModel) {
+    return converterComprimento(valor, deUnidade, paraUnidade);
+  } else if (medida is MassaModel) {
+    return converterMassa(valor, deUnidade, paraUnidade);
+  } else if (medida is CapacidadeModel) {
+    return converterCapacidade(valor, deUnidade, paraUnidade);
   }
 
+  return valor;
+}
   double converterTemperatura(double valor, String deTemp, String paraTemp) {
     double resultado = 0.0;
 
