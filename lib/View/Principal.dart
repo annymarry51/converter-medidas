@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/View/Configuracoes.dart';
+import 'package:flutter_application_2/ViewModel/Idiomas.dart';
+import 'package:provider/provider.dart';
 import '../Model/MedidaModel.dart';
 import '../Model/TemperaturaModel.dart';
 import '../Model/ComprimentoModel.dart';
@@ -24,10 +26,11 @@ class _PrincipalState extends State<Principal> {
 
   @override
   Widget build(BuildContext context) {
+    final idiomas = Provider.of<Idiomas>(context);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Conversor de Unidades'),
+        title: Text(idiomas.t('tituloApp')),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         actions: [
           IconButton(
@@ -49,10 +52,10 @@ class _PrincipalState extends State<Principal> {
             child: PageView(
               controller: PageController(viewportFraction: 0.35),
               children: [
-                construirBotoesCarrossel('Temperatura'),
-                construirBotoesCarrossel('Comprimento'),
-                construirBotoesCarrossel('Peso'),
-                construirBotoesCarrossel('Capacidade'),
+                construirBotoesCarrossel('Temperatura', idiomas.t('temperatura')),
+                construirBotoesCarrossel('Comprimento', idiomas.t('comprimento')),
+                construirBotoesCarrossel('Peso', idiomas.t('peso')),
+                construirBotoesCarrossel('Capacidade', idiomas.t('capacidade')),
               ],
             ),
           ),
@@ -84,7 +87,20 @@ class _PrincipalState extends State<Principal> {
                 ),
                 child: IconButton(
                   icon: const Icon(Icons.compare_arrows, color: Colors.white),
-                  onPressed: () => print("Inverter!"),
+                  onPressed: () {
+                    if (unidadeOrigem == null || unidadeDestino == null) {
+                      return;
+                    }
+                    setState(() {
+                      final unidadeTemp = unidadeOrigem;
+                      unidadeOrigem = unidadeDestino;
+                      unidadeDestino = unidadeTemp;
+
+                      final valorTemp = origemController.text;
+                      origemController.text = destinoController.text;
+                      destinoController.text = valorTemp;
+                    });
+                  },
                 ),
               ),
 
@@ -129,16 +145,19 @@ class _PrincipalState extends State<Principal> {
                     ),
                   ),
                   onPressed: () {
-                    if (medidaSelecionada == null ||
-                        unidadeOrigem == null ||
-                        unidadeDestino == null ||
-                        origemController.text.isEmpty) {
+                    final erro = validarEntrada(idiomas);
+                    if (erro != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(erro)),
+                      );
                       return;
                     }
 
-                    double valor = double.tryParse(origemController.text) ?? 0;
+                    final valor = double.parse(
+                      origemController.text.replaceAll(',', '.'),
+                    );
 
-                    double resultado = conversor.converter(
+                    final resultado = conversor.converter(
                       medidaSelecionada!,
                       valor,
                       unidadeOrigem!,
@@ -149,9 +168,9 @@ class _PrincipalState extends State<Principal> {
                       destinoController.text = resultado.toStringAsFixed(6);
                     });
                   },
-                  child: const Text(
-                    'Converter',
-                    style: TextStyle(fontSize: 24, color: Color(0xFFE6B8E6)),
+                  child: Text(
+                    idiomas.t('converter'),
+                    style: const TextStyle(fontSize: 24, color: Color(0xFFE6B8E6)),
                   ),
                 ),
               ),
@@ -162,7 +181,39 @@ class _PrincipalState extends State<Principal> {
     );
   }
 
-  Container construirBotoesCarrossel(String texto) {
+  /// Valida os campos antes de converter.
+  /// Retorna a mensagem de erro traduzida, ou `null` se estiver tudo certo.
+  String? validarEntrada(Idiomas idiomas) {
+    if (medidaSelecionada == null) {
+      return idiomas.t('erroSelecioneMedida');
+    }
+    if (unidadeOrigem == null || unidadeDestino == null) {
+      return idiomas.t('erroSelecioneUnidades');
+    }
+
+    final texto = origemController.text.trim().replaceAll(',', '.');
+    final valor = double.tryParse(texto);
+    if (texto.isEmpty || valor == null) {
+      return idiomas.t('erroValorInvalido');
+    }
+
+    if (medidaSelecionada is TemperaturaModel) {
+      final limiteMinimo = unidadeOrigem == 'K'
+          ? 0.0
+          : unidadeOrigem == '°F'
+              ? -459.67
+              : -273.15;
+      if (valor < limiteMinimo) {
+        return idiomas.t('erroTemperaturaAbsZero');
+      }
+    } else if (valor < 0) {
+      return idiomas.t('erroValorNegativo');
+    }
+
+    return null;
+  }
+
+  Container construirBotoesCarrossel(String chave, String rotulo) {
     return Container(
       height: 50,
       width: 200,
@@ -176,7 +227,7 @@ class _PrincipalState extends State<Principal> {
         ),
         onPressed: () {
           setState(() {
-            switch (texto) {
+            switch (chave) {
               case 'Temperatura':
                 medidaSelecionada = TemperaturaModel();
                 break;
@@ -192,10 +243,12 @@ class _PrincipalState extends State<Principal> {
             }
             unidadeOrigem = null;
             unidadeDestino = null;
+            origemController.clear();
+            destinoController.clear();
           });
         },
         child: Text(
-          texto,
+          rotulo,
           style: const TextStyle(fontSize: 24, color: Color(0xFFE6B8E6)),
         ),
       ),
@@ -217,9 +270,9 @@ class _PrincipalState extends State<Principal> {
             controller: controller,
             readOnly: somenteLeitura,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Valor',
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              hintText: Provider.of<Idiomas>(context).t('valor'),
             ),
           ),
         ),
