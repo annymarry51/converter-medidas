@@ -19,7 +19,7 @@ class _PrincipalState extends State<Principal> {
   final TextEditingController destinoController = TextEditingController();
 
   final Conversor conversor = Conversor();
-  MedidaModel? medidaSelecionada;
+  MedidaModel medidaSelecionada = TemperaturaModel();
   String? unidadeOrigem;
   String? unidadeDestino;
   double? valorOrigem;
@@ -46,17 +46,34 @@ class _PrincipalState extends State<Principal> {
       ),
       body: Column(
         children: [
-          SizedBox(height: 50),
           Container(
             height: 80,
-            child: PageView(
-              controller: PageController(viewportFraction: 0.35),
-              children: [
-                construirBotoesCarrossel('Temperatura', idiomas.t('temperatura')),
-                construirBotoesCarrossel('Comprimento', idiomas.t('comprimento')),
-                construirBotoesCarrossel('Peso', idiomas.t('peso')),
-                construirBotoesCarrossel('Capacidade', idiomas.t('capacidade')),
-              ],
+            child: selecionarMedida(
+              selecionado: medidaSelecionada.nome,
+              onChanged: (String? value) {
+                if (value == null) return;
+                setState(() {
+                  switch (value) {
+                    case 'Temperatura':
+                      medidaSelecionada = TemperaturaModel();
+                      break;
+                    case 'Comprimento':
+                      medidaSelecionada = ComprimentoModel();
+                      break;
+                    case 'Massa':
+                    case 'Peso':
+                      medidaSelecionada = MassaModel();
+                      break;
+                    case 'Capacidade':
+                      medidaSelecionada = CapacidadeModel();
+                      break;
+                  }
+                  unidadeOrigem = null;
+                  unidadeDestino = null;
+                  origemController.clear();
+                  destinoController.clear();
+                });
+              },
             ),
           ),
           const Padding(padding: EdgeInsets.symmetric(vertical: 40)),
@@ -109,7 +126,7 @@ class _PrincipalState extends State<Principal> {
                   color: const Color(0xFFE6B8E6),
                   child: Center(
                     child: construirCaixinhaConversao(
-                      items: medidaSelecionada?.unidades ?? [],
+                      items: medidaSelecionada.unidades,
                       selecionado: unidadeDestino,
                       controller: destinoController,
                       somenteLeitura: true,
@@ -147,9 +164,9 @@ class _PrincipalState extends State<Principal> {
                   onPressed: () {
                     final erro = validarEntrada(idiomas);
                     if (erro != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(erro)),
-                      );
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text(erro)));
                       return;
                     }
 
@@ -165,12 +182,15 @@ class _PrincipalState extends State<Principal> {
                     );
 
                     setState(() {
-                      destinoController.text = resultado.toStringAsFixed(6);
+                      destinoController.text = resultado.toString();
                     });
                   },
                   child: Text(
                     idiomas.t('converter'),
-                    style: const TextStyle(fontSize: 24, color: Color(0xFFE6B8E6)),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      color: Color(0xFFE6B8E6),
+                    ),
                   ),
                 ),
               ),
@@ -184,13 +204,9 @@ class _PrincipalState extends State<Principal> {
   /// Valida os campos antes de converter.
   /// Retorna a mensagem de erro traduzida, ou `null` se estiver tudo certo.
   String? validarEntrada(Idiomas idiomas) {
-    if (medidaSelecionada == null) {
-      return idiomas.t('erroSelecioneMedida');
-    }
     if (unidadeOrigem == null || unidadeDestino == null) {
       return idiomas.t('erroSelecioneUnidades');
     }
-
     final texto = origemController.text.trim().replaceAll(',', '.');
     final valor = double.tryParse(texto);
     if (texto.isEmpty || valor == null) {
@@ -201,8 +217,8 @@ class _PrincipalState extends State<Principal> {
       final limiteMinimo = unidadeOrigem == 'K'
           ? 0.0
           : unidadeOrigem == '°F'
-              ? -459.67
-              : -273.15;
+          ? -459.67
+          : -273.15;
       if (valor < limiteMinimo) {
         return idiomas.t('erroTemperaturaAbsZero');
       }
@@ -251,6 +267,35 @@ class _PrincipalState extends State<Principal> {
           rotulo,
           style: const TextStyle(fontSize: 24, color: Color(0xFFE6B8E6)),
         ),
+      ),
+    );
+  }
+
+  Widget selecionarMedida({
+    required String selecionado,
+    required ValueChanged<String?> onChanged,
+  }) {
+    final idiomas = Provider.of<Idiomas>(context);
+
+    List<Map<String, String>> items = [
+      {"key": "Capacidade", "label": idiomas.t("capacidade")},
+      {"key": "Comprimento", "label": idiomas.t("comprimento")},
+      {"key": "Massa", "label": idiomas.t("massa")},
+      {"key": "Temperatura", "label": idiomas.t("temperatura")},
+    ];
+    return DropdownButtonHideUnderline(
+      child: DropdownButton<String>(
+        value: selecionado,
+        isExpanded: true,
+        items: items
+            .map(
+              (unidade) => DropdownMenuItem(
+                value: unidade["key"],
+                child: Text(unidade["label"] ?? ""),
+              ),
+            )
+            .toList(),
+        onChanged: onChanged,
       ),
     );
   }
