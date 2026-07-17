@@ -44,158 +44,153 @@ class _PrincipalState extends State<Principal> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Container(
-            height: 80,
-            child: selecionarMedida(
-              selecionado: medidaSelecionada.nome,
-              onChanged: (String? value) {
-                if (value == null) return;
-                setState(() {
-                  switch (value) {
-                    case 'Temperatura':
-                      medidaSelecionada = TemperaturaModel();
-                      break;
-                    case 'Comprimento':
-                      medidaSelecionada = ComprimentoModel();
-                      break;
-                    case 'Massa':
-                    case 'Peso':
-                      medidaSelecionada = MassaModel();
-                      break;
-                    case 'Capacidade':
-                      medidaSelecionada = CapacidadeModel();
-                      break;
-                  }
-                  unidadeOrigem = null;
-                  unidadeDestino = null;
-                  origemController.clear();
-                  destinoController.clear();
-                });
-              },
-            ),
-          ),
-          const Padding(padding: EdgeInsets.symmetric(vertical: 40)),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  color: const Color(0xFFE6B8E6),
-                  child: Center(
-                    child: construirCaixinhaConversao(
-                      items: medidaSelecionada?.unidades ?? [],
-                      selecionado: unidadeOrigem,
-                      controller: origemController,
-                      onChanged: (novoValor) {
-                        setState(() {
-                          unidadeOrigem = novoValor;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-              ),
-
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.purple.shade700,
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.compare_arrows, color: Colors.white),
-                  onPressed: () {
-                    if (unidadeOrigem == null || unidadeDestino == null) {
-                      return;
+      body: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          children: [
+            Container(
+              height: 80,
+              child: selecionarMedida(
+                selecionado: medidaSelecionada.nome,
+                onChanged: (String? value) {
+                  if (value == null) return;
+                  setState(() {
+                    switch (value) {
+                      case 'Temperatura':
+                        medidaSelecionada = TemperaturaModel();
+                        break;
+                      case 'Comprimento':
+                        medidaSelecionada = ComprimentoModel();
+                        break;
+                      case 'Massa':
+                      case 'Peso':
+                        medidaSelecionada = MassaModel();
+                        break;
+                      case 'Capacidade':
+                        medidaSelecionada = CapacidadeModel();
+                        break;
                     }
-                    setState(() {
-                      final unidadeTemp = unidadeOrigem;
-                      unidadeOrigem = unidadeDestino;
-                      unidadeDestino = unidadeTemp;
-
-                      final valorTemp = origemController.text;
-                      origemController.text = destinoController.text;
-                      destinoController.text = valorTemp;
-                    });
-                  },
-                ),
+                    unidadeOrigem = null;
+                    unidadeDestino = null;
+                    origemController.clear();
+                    destinoController.clear();
+                  });
+                },
               ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    color: const Color(0xFFE6B8E6),
+                    child: Center(
+                      child: construirCaixinhaConversao(
+                        items: medidaSelecionada.unidades,
+                        selecionado: unidadeOrigem,
+                        controller: origemController,
+                        onChanged: (novoValor) {
+                          setState(() {
+                            unidadeOrigem = novoValor;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
 
-              Expanded(
-                child: Container(
-                  color: const Color(0xFFE6B8E6),
-                  child: Center(
-                    child: construirCaixinhaConversao(
-                      items: medidaSelecionada.unidades,
-                      selecionado: unidadeDestino,
-                      controller: destinoController,
-                      somenteLeitura: true,
-                      onChanged: (novoValor) {
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.purple.shade700,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.compare_arrows,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        if (unidadeOrigem == null || unidadeDestino == null) {
+                          return;
+                        }
                         setState(() {
-                          unidadeDestino = novoValor;
+                          final unidadeTemp = unidadeOrigem;
+                          unidadeOrigem = unidadeDestino;
+                          unidadeDestino = unidadeTemp;
+
+                          final valorTemp = origemController.text;
+                          origemController.text = destinoController.text;
+                          destinoController.text = valorTemp;
                         });
                       },
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+
+                Expanded(
+                  child: Container(
+                    color: const Color(0xFFE6B8E6),
+                    child: Center(
+                      child: construirCaixinhaConversao(
+                        items: medidaSelecionada.unidades,
+                        selecionado: unidadeDestino,
+                        controller: destinoController,
+                        somenteLeitura: true,
+                        onChanged: (novoValor) {
+                          setState(() {
+                            unidadeDestino = novoValor;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: Container(
         height: 90,
         color: Colors.purple.shade900,
-        child: Row(
-          children: [
-            Center(
-              child: Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF744383),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                  onPressed: () {
-                    final erro = validarEntrada(idiomas);
-                    if (erro != null) {
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text(erro)));
-                      return;
-                    }
-
-                    final valor = double.parse(
-                      origemController.text.replaceAll(',', '.'),
-                    );
-
-                    final resultado = conversor.converter(
-                      medidaSelecionada!,
-                      valor,
-                      unidadeOrigem!,
-                      unidadeDestino!,
-                    );
-
-                    setState(() {
-                      destinoController.text = resultado.toString();
-                    });
-                  },
-                  child: Text(
-                    idiomas.t('converter'),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      color: Color(0xFFE6B8E6),
-                    ),
-                  ),
-                ),
+        child: Center(
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF744383),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
               ),
             ),
-          ],
+            onPressed: () {
+              final erro = validarEntrada(idiomas);
+              if (erro != null) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(erro)));
+                return;
+              }
+
+              final valor = double.parse(
+                origemController.text.replaceAll(',', '.'),
+              );
+
+              final resultado = conversor.converter(
+                medidaSelecionada,
+                valor,
+                unidadeOrigem!,
+                unidadeDestino!,
+              );
+
+              setState(() {
+                destinoController.text = resultado.toString();
+              });
+            },
+            child: Text(
+              idiomas.t('converter'),
+              style: const TextStyle(fontSize: 24, color: Color(0xFFE6B8E6)),
+            ),
+          ),
         ),
       ),
     );
@@ -229,48 +224,6 @@ class _PrincipalState extends State<Principal> {
     return null;
   }
 
-  Container construirBotoesCarrossel(String chave, String rotulo) {
-    return Container(
-      height: 50,
-      width: 200,
-      margin: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF744383),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-        ),
-        onPressed: () {
-          setState(() {
-            switch (chave) {
-              case 'Temperatura':
-                medidaSelecionada = TemperaturaModel();
-                break;
-              case 'Comprimento':
-                medidaSelecionada = ComprimentoModel();
-                break;
-              case 'Peso':
-                medidaSelecionada = MassaModel();
-                break;
-              case 'Capacidade':
-                medidaSelecionada = CapacidadeModel();
-                break;
-            }
-            unidadeOrigem = null;
-            unidadeDestino = null;
-            origemController.clear();
-            destinoController.clear();
-          });
-        },
-        child: Text(
-          rotulo,
-          style: const TextStyle(fontSize: 24, color: Color(0xFFE6B8E6)),
-        ),
-      ),
-    );
-  }
-
   Widget selecionarMedida({
     required String selecionado,
     required ValueChanged<String?> onChanged,
@@ -284,18 +237,21 @@ class _PrincipalState extends State<Principal> {
       {"key": "Temperatura", "label": idiomas.t("temperatura")},
     ];
     return DropdownButtonHideUnderline(
-      child: DropdownButton<String>(
-        value: selecionado,
-        isExpanded: true,
-        items: items
-            .map(
-              (unidade) => DropdownMenuItem(
-                value: unidade["key"],
-                child: Text(unidade["label"] ?? ""),
-              ),
-            )
-            .toList(),
-        onChanged: onChanged,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: DropdownButton<String>(
+          value: selecionado,
+          isExpanded: true,
+          items: items
+              .map(
+                (unidade) => DropdownMenuItem(
+                  value: unidade["key"],
+                  child: Text(unidade["label"] ?? ""),
+                ),
+              )
+              .toList(),
+          onChanged: onChanged,
+        ),
       ),
     );
   }
@@ -310,7 +266,7 @@ class _PrincipalState extends State<Principal> {
     return Row(
       children: [
         SizedBox(
-          width: 100,
+          width: 80,
           child: TextField(
             controller: controller,
             readOnly: somenteLeitura,
@@ -321,7 +277,6 @@ class _PrincipalState extends State<Principal> {
             ),
           ),
         ),
-        const SizedBox(width: 8),
         Expanded(
           child: DropdownButton<String>(
             value: selecionado,
