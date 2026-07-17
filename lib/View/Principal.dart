@@ -31,7 +31,7 @@ class _PrincipalState extends State<Principal> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(idiomas.t('tituloApp')),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -81,19 +81,16 @@ class _PrincipalState extends State<Principal> {
             Row(
               children: [
                 Expanded(
-                  child: Container(
-                    color: const Color(0xFFE6B8E6),
-                    child: Center(
-                      child: construirCaixinhaConversao(
-                        items: medidaSelecionada.unidades,
-                        selecionado: unidadeOrigem,
-                        controller: origemController,
-                        onChanged: (novoValor) {
-                          setState(() {
-                            unidadeOrigem = novoValor;
-                          });
-                        },
-                      ),
+                  child: Center(
+                    child: construirCaixinhaConversao(
+                      items: medidaSelecionada.unidades,
+                      selecionado: unidadeOrigem,
+                      controller: origemController,
+                      onChanged: (novoValor) {
+                        setState(() {
+                          unidadeOrigem = novoValor;
+                        });
+                      },
                     ),
                   ),
                 ),
@@ -102,7 +99,7 @@ class _PrincipalState extends State<Principal> {
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.purple.shade700,
+                      color: Theme.of(context).colorScheme.primary,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
@@ -129,20 +126,17 @@ class _PrincipalState extends State<Principal> {
                 ),
 
                 Expanded(
-                  child: Container(
-                    color: const Color(0xFFE6B8E6),
-                    child: Center(
-                      child: construirCaixinhaConversao(
-                        items: medidaSelecionada.unidades,
-                        selecionado: unidadeDestino,
-                        controller: destinoController,
-                        somenteLeitura: true,
-                        onChanged: (novoValor) {
-                          setState(() {
-                            unidadeDestino = novoValor;
-                          });
-                        },
-                      ),
+                  child: Center(
+                    child: construirCaixinhaConversao(
+                      items: medidaSelecionada.unidades,
+                      selecionado: unidadeDestino,
+                      controller: destinoController,
+                      somenteLeitura: true,
+                      onChanged: (novoValor) {
+                        setState(() {
+                          unidadeDestino = novoValor;
+                        });
+                      },
                     ),
                   ),
                 ),
@@ -153,11 +147,11 @@ class _PrincipalState extends State<Principal> {
       ),
       bottomNavigationBar: Container(
         height: 90,
-        color: Colors.purple.shade900,
+        color: Theme.of(context).colorScheme.primary,
         child: Center(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF744383),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
@@ -188,7 +182,7 @@ class _PrincipalState extends State<Principal> {
             },
             child: Text(
               idiomas.t('converter'),
-              style: const TextStyle(fontSize: 24, color: Color(0xFFE6B8E6)),
+              style: const TextStyle(fontSize: 24, color: Color.fromARGB(255, 252, 250, 252)),
             ),
           ),
         ),
@@ -266,7 +260,7 @@ class _PrincipalState extends State<Principal> {
     return Row(
       children: [
         SizedBox(
-          width: 80,
+          width: 90,
           child: TextField(
             controller: controller,
             readOnly: somenteLeitura,
@@ -277,6 +271,7 @@ class _PrincipalState extends State<Principal> {
             ),
           ),
         ),
+        SizedBox(width: 8),
         Expanded(
           child: DropdownButton<String>(
             value: selecionado,
