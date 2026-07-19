@@ -16,6 +16,7 @@ class _ConfiguracoesState extends State<Configuracoes> {
     return Scaffold(
       appBar: AppBar(
         title: Text(idiomas.t('configuracoes')),
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,

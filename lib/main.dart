@@ -42,21 +42,21 @@ class MyApp extends StatelessWidget {
   ThemeData obterTema(String temaSelecionado) {
     switch (temaSelecionado) {
       case 'Azul':
-        return ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 160, 208, 248),
+        return ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
          colorScheme: ColorScheme.light(
-          primary: const Color.fromARGB(255, 81, 117, 246),
-          secondary: const Color.fromARGB(255, 137, 225, 239),
+          primary: const Color.fromARGB(255, 130, 155, 247),
+          secondary: const Color.fromARGB(255, 45, 107, 240),
         ),);
       case 'Verde':
-        return ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 148, 245, 151),
+        return ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
          colorScheme: ColorScheme.light(
-          primary: Colors.green.shade700,
-          secondary: Colors.green.shade300,
+          primary: Colors.green.shade300,
+          secondary: Colors.green.shade700,
         ),);
       default:
-        return ThemeData(scaffoldBackgroundColor: Color.fromARGB(255, 205, 68, 247),
+        return ThemeData(scaffoldBackgroundColor: Color.fromARGB(255, 255, 255, 255),
          colorScheme: ColorScheme.light(
-          primary: Color(0xFFE6B8E6),
+          primary: Color.fromARGB(255, 203, 143, 240),
           secondary: Color.fromARGB(255, 121, 1, 157),
         ),);
     }
