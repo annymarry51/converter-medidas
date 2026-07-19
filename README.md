@@ -5,8 +5,10 @@ converter medidas
  O projeto consiste em um conversor de medidas para: temperatura, comprimento, capacidade e massa.
 
 ## Bibliotecas utilizadas
-
-*
+*import 'package:flutter/foundation.dart';
+*import 'package:flutter/material.dart';
+*import 'package:shared_preferences/shared_preferences.dart';
+*import 'package:device_preview_plus/device_preview_plus.dart';
 
 ## Autores
 
