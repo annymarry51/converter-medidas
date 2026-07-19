@@ -30,35 +30,12 @@ class MyApp extends StatelessWidget {
     return Consumer<Preferencias>(
       builder: (context, prefs, child) {
         return MaterialApp(
-          theme: obterTema(
+          theme:preferencias.obterTema(
             prefs.temaSelecionado,
           ), 
           home: Principal(),
         );
       },
     );
-  }
-
-  ThemeData obterTema(String temaSelecionado) {
-    switch (temaSelecionado) {
-      case 'Azul':
-        return ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
-         colorScheme: ColorScheme.light(
-          primary: const Color.fromARGB(255, 130, 155, 247),
-          secondary: const Color.fromARGB(255, 45, 107, 240),
-        ),);
-      case 'Verde':
-        return ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
-         colorScheme: ColorScheme.light(
-          primary: Colors.green.shade300,
-          secondary: Colors.green.shade700,
-        ),);
-      default:
-        return ThemeData(scaffoldBackgroundColor: Color.fromARGB(255, 255, 255, 255),
-         colorScheme: ColorScheme.light(
-          primary: Color.fromARGB(255, 203, 143, 240),
-          secondary: Color.fromARGB(255, 121, 1, 157),
-        ),);
-    }
   }
 }
